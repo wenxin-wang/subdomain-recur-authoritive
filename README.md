@@ -15,11 +15,22 @@ subdomain", e.g. "re.example.com", all names in that subdomain (e.g.
 
 ```bash
 cd subdomain-recur-cname-authorative/
-pdns_server --config-dir=. 
+pdns_server --config-dir=test
+# pdns_server --config-dir=test-dns64
 dig -p 5333 @::1 A    re.example.com
 dig -p 5333 @::1 A    www.google.com.re.example.com
 dig -p 5333 @::1 AAAA www.google.com.re.example.com
 dig -p 5333 @::1 A    1.1.1.1.re.example.com
 dig -p 5333 @::1 AAAA 1.1.1.1.re.example.com
 dig -p 5333 @::1 A    1.1.1.1111.re.example.com
+```
+
+
+# DNS64 pipe backend test protocol
+
+```
+HELO 1
+Q www.tsinghua.edu.cn.re.example.com IN A 1 127.0.0.1
+Q www.tsinghua.edu.cn.re.example.com IN ANY 1 127.0.0.1
+Q www.douban.com.re.example.com IN ANY 1 127.0.0.1
 ```
