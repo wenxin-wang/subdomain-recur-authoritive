@@ -1,5 +1,7 @@
 #!/bin/sh
 
+DEBUG=1
+
 DOMAIN="re.example.com"
 PREFIX="64:ff9b::"
 NS="ns.re.example.com"
@@ -54,20 +56,24 @@ done
 while true; do
     read -r CMD QNAME QCLASS QTYPE ID REMOTE_IP
     if [ z"$CMD" != zQ ]; then
+        log_err "Unknown cmd $CMD"
         echo FAIL
-        if [ z"$CMD" != zAXFR ]; then
-            log_err "Unknown cmd $CMD"
-            exit 1
-        fi
         continue
     fi
     name=${QNAME%%.$DOMAIN}
+    if [ z"$DEBUG" == z1 ]; then
+        log_err "$CMD $QNAME $name $QTYPE"
+    fi
+    if [ z"$QTYPE" == zSOA ]; then
+        get_record SOA "$SOA"
+        echo END
+        continue
+    fi
     if echo $name | is_ip; then
         a_records=$name
         aaaa_records=""
     else
-        # nslookup has the result in column 3
-        result=$(nslookup $name 2>/dev/null| grep -E '^Address' | grep -v '#' | awk '{print $3}')
+        result=$(getent ahosts $name 2>/dev/null| grep DGRAM | awk '{print $1}')
         a_records=$(echo "$result" | grep -v ':')
         aaaa_records=$(echo "$result" | grep ':')
     fi
