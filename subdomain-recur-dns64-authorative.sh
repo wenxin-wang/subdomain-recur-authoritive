@@ -58,6 +58,7 @@ while true; do
     if [ z"$CMD" != zQ ]; then
         log_err "Unknown cmd $CMD"
         echo FAIL
+	sleep 1
         continue
     fi
     name=${QNAME%%.$DOMAIN}
@@ -88,10 +89,11 @@ while true; do
     if [ z"$QTYPE" == zAAAA ] || [ z"$QTYPE" == zANY ]; then
         if [ z"$aaaa_records" == z ]; then
             aaaa_records=$(for r in $a_records; do echo $r | ivi96; done)
-        fi
-        for r in $aaaa_records; do
-            get_record AAAA $r
-        done
+	else
+	    for r in $aaaa_records; do
+		get_record AAAA $r
+	    done
+	fi
     fi
     echo END
 done
